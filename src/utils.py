@@ -357,6 +357,6 @@ def mnicorr2niigz(compo, label_out='', save=False, path_glasser = "template/glas
     new_img = nib.Nifti1Image(glasser_signal, affine)
 
     if save ==True : 
-        nib.save(new_img,f"outs/brain_networks/{label_out}.nii.gz")
+        nib.save(new_img,OUT_PATH + f"/{label_out}.nii.gz")
 
     return new_img

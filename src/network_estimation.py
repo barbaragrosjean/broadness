@@ -30,8 +30,8 @@ class NetworkResult:
     def n_components(self) -> int:
         return self.components.shape[0]
     
-    def get_nifti_component(self, compo, save=False, path_glasser: str = "template/glasser360MNI.nii.gz", path_MNI :str = 'template/MNI152_8mm_coord_dyi.mat'): 
-        img = mnicorr2niigz(self.components[compo-1, :], label_out='component' + str(compo) , save=save, path_glasser=path_glasser,path_MNI=path_MNI )
+    def get_nifti_component(self, n_compo, save=False, path_glasser: str = "template/glasser360MNI.nii.gz", path_MNI :str = 'template/MNI152_8mm_coord_dyi.mat'): 
+        img = mnicorr2niigz(self.components[n_compo-1, :], label_out='brain_networks/component' + str(n_compo) , save=save, path_glasser=path_glasser,path_MNI=path_MNI )
         return img
 
     def plot_components_interactive(self, n_compo: int, path_glasser: str = "template/glasser360MNI.nii.gz", path_MNI :str = 'template/MNI152_8mm_coord_dyi.mat') :
@@ -106,7 +106,7 @@ class NetworkResult:
                 the_ax.set_title(c_name)
                 for i in time_course_to_plot : 
                     the_ax.plot(self.timecourses[c_name].loc[:, f'Net{i}_{c_name}'], label=f'Net_{i}')
-                    the_ax.grid()
+                the_ax.grid()
 
         # all condition 1 ts per compo 
         if groupby == 'components' : 
@@ -120,7 +120,7 @@ class NetworkResult:
                         the_ax=ax[j-1]
                     the_ax.set_title('Net' + str(j))
                     the_ax.plot(self.timecourses[i].loc[:, f'Net{j}_{i}'], label=i)
-                    the_ax.grid()
+                the_ax.grid()
         
         the_ax.legend()
         label= 'Net'
@@ -137,7 +137,7 @@ class NetworkResult:
     
     def plot_variance(self, save=False) : 
         fig, ax=plt.subplots(figsize=(8, 3))
-        ax.plot(['PC' + str(i) for i in range(len(self.explained_variance))], self.explained_variance*100, c='k')
+        ax.plot(['PC' + str(i+1) for i in range(len(self.explained_variance))], self.explained_variance*100, c='k')
         ax.set_ylabel('Explained variance (%)')
         ax.grid()
         if save:

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
 
-
+from src.config import OUT_PATH
 
 @dataclass
 class RQAResult:
@@ -67,7 +67,7 @@ class RQAResult:
         ani = FuncAnimation(fig, update, frames=n_timepoints, interval=100, blit=False)
 
         if save:
-            ani.save('phase.gif', writer="pillow", fps=15)
+            ani.save(OUT_PATH + f'/phase_{condition}.gif', writer="pillow", fps=15)
             
             plt.close()  
 

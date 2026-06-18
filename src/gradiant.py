@@ -21,12 +21,15 @@ class ClusteringResult:
     componants:np.ndarray
     method: str
 
-    def plot_clusters_brain(self, save_niigz=True, MNI_path='data/MNI152_8mm_coord_dyi.mat'):
+    def plot_clusters_brain(self, save_niigz=False, MNI_path='data/MNI152_8mm_coord_dyi.mat'):
         cluster_labels = self.labels
         set1_colors = plt.cm.Set2(np.linspace(0, 1, len(np.unique(cluster_labels) - 1)))
-        img = mnicorr2niigz(cluster_labels + 1, 'clusters', save =save_niigz)
-        plotting.plot_glass_brain(img, display_mode='lyrz', cmap=ListedColormap(np.vstack([[1, 1, 1, 1], set1_colors])), title=f'{self.method} Clusters')
-    
+        img = mnicorr2niigz(cluster_labels + 1, f'/clusters/cluster_{self.method}', save =save_niigz)
+        fig= plotting.plot_glass_brain(img, display_mode='lyrz', cmap=ListedColormap(np.vstack([[1, 1, 1, 1], set1_colors])), title=f'{self.method} Clusters')
+        
+        if save : 
+            fig.savefig(OUT_PATH + f'/clusters/cluster_{self.method}.png')
+        return fig
 
 def cluster_number(compo:np.ndarray, range_n_clusters = np.arange(2, 12, 1), summary=True) : 
     """
