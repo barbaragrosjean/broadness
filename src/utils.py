@@ -9,6 +9,16 @@ from sklearn.decomposition import PCA, FastICA
 import nibabel as nib
 import matplotlib.pyplot as plt
 
+import json
+
+with open("src/config.json", "r") as f:
+    config = json.load(f)
+
+OUT_PATH = config['OUT_PATH']
+TEMPLATE_PATH = config['TEMPLATE_PATH']
+DATA_PATH = config['DATA_PATH']
+mni_coords = config['mni_coordinates']
+mni_glasser = config['mni_glasser']
     
 def compute_significant_pcs(data, variance, permutations_num=100, randomization=1, summary=False):
     """
@@ -277,7 +287,7 @@ def data_overview(data, conditions, method ='pca', nb_compo_to_try=10, thr_pca =
     
     return int(nb_compo)
 
-def mnicorr2niigz(compo, label_out='', save=False, path_glasser = "template/glasser360MNI.nii.gz", path_MNI = 'template/MNI152_8mm_coord_dyi.mat') :
+def mnicorr2niigz(compo, label_out='out', save=False, path_glasser = mni_glasser, path_MNI = mni_coords) :
     """
     Map component values to a volumetric NIfTI image using the Glasser atlas and MNI coordinates.
 
@@ -357,6 +367,6 @@ def mnicorr2niigz(compo, label_out='', save=False, path_glasser = "template/glas
     new_img = nib.Nifti1Image(glasser_signal, affine)
 
     if save ==True : 
-        nib.save(new_img,OUT_PATH + f"/{label_out}.nii.gz")
+        nib.save(new_img, f"{label_out}.nii.gz")
 
     return new_img

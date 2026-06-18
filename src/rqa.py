@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 import pandas as pd
 import numpy as np
+import os
 
 from scipy.spatial.distance import cdist
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
 
-from src.config import OUT_PATH
+from src.utils import OUT_PATH
 
 @dataclass
 class RQAResult:
@@ -16,7 +17,11 @@ class RQAResult:
     distance_matrices: dict
     phase_space_data:dict
 
-    def animate_phase_space(self,condition,output_dir="figures", selected_time_id=None, save=True):
+    def __post_init__(self):
+        self.path_to_save =  OUT_PATH + '/rqa'
+        os.makedirs(self.path_to_save, exist_ok=True)
+
+    def animate_phase_space(self,condition,output_dir="figures", selected_time_id=None, save=False):
         phase_data = self.phase_space_data[condition]
 
         trajectory = phase_data["trajectory"]
@@ -67,11 +72,11 @@ class RQAResult:
         ani = FuncAnimation(fig, update, frames=n_timepoints, interval=100, blit=False)
 
         if save:
-            ani.save(OUT_PATH + f'/phase_{condition}.gif', writer="pillow", fps=15)
+            ani.save(self.path_to_save+ f'/phase_{condition}.gif', writer="pillow", fps=15)
             
             plt.close()  
 
-    def plot_recurrence(self,condition,time=None,cmap="Blues", store=True):
+    def plot_recurrence(self,condition,time=None,cmap="Blues", save=False):
         D = self.distance_matrices[condition]
         titles = ["Distance Matrix PC1","Distance Matrix PC2","Distance Matrix Multivariate"]
         fig, ax = plt.subplots(1,3,figsize=(15, 5))
@@ -91,8 +96,9 @@ class RQAResult:
         fig.colorbar(im,ax=ax,label="Distance")
         plt.tight_layout()
 
-        if store :
-            return 0 #TODO
+        if save :
+            fig.savefig(self.path_to_save + f'/recurence.png')
+            plt.close()
 
         return fig
             
@@ -175,7 +181,7 @@ def rqa_measures(R, lmin=2, vmin=2):
 
     return {"RR": RR, "DET": DET, "ENTR": ENTR, "LAM": LAM, "TT": TT}
 
-def compute_rqa(out_all, conditions, time, nb_compo, method='pca',  summary=True, save=True, eps=0.1, selected_time_id = None): 
+def compute_rqa(out_all, conditions, time, nb_compo, method='pca',  summary=True, eps=0.1, selected_time_id = None): 
     df_rqa = pd.DataFrame()
 
     recurrence_matrices={}

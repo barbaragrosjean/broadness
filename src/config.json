@@ -1,0 +1,8 @@
+{
+    "OUT_PATH" : "outs", 
+    "DATA_PATH" : "datasets", 
+    "TEMPLATE_PATH" : "template",
+    "mni_glasser" : "template/glasser360MNI.nii.gz", 
+    "mni_coordinates" : "template/MNI152_8mm_coord_dyi.mat"
+
+}

@@ -14,8 +14,7 @@ from nilearn import plotting
 
 from sklearn.decomposition import PCA, FastICA
 
-from utils import mnicorr2niigz
-from config import OUT_PATH
+from src.utils import mnicorr2niigz, OUT_PATH, mni_coords, mni_glasser
 
 
 @dataclass
@@ -26,15 +25,19 @@ class NetworkResult:
     reconstructed_activity: Dict[str, np.ndarray]
     conditions: Dict[str, int]
 
+    def __post_init__(self):
+        self.path_to_save =  OUT_PATH + '/network_estimation'
+        os.makedirs(self.path_to_save, exist_ok=True)
+
     @property
     def n_components(self) -> int:
         return self.components.shape[0]
     
-    def get_nifti_component(self, n_compo, save=False, path_glasser: str = "template/glasser360MNI.nii.gz", path_MNI :str = 'template/MNI152_8mm_coord_dyi.mat'): 
-        img = mnicorr2niigz(self.components[n_compo-1, :], label_out='brain_networks/component' + str(n_compo) , save=save, path_glasser=path_glasser,path_MNI=path_MNI )
+    def get_nifti_component(self, n_compo, save=False, path_glasser: str = mni_glasser, path_MNI :str = mni_coords): 
+        img = mnicorr2niigz(self.components[n_compo-1, :], label_out= self.path_to_save + f'/component' + str(n_compo) , save=save, path_glasser=path_glasser,path_MNI=path_MNI )
         return img
 
-    def plot_components_interactive(self, n_compo: int, path_glasser: str = "template/glasser360MNI.nii.gz", path_MNI :str = 'template/MNI152_8mm_coord_dyi.mat') :
+    def plot_components_interactive(self, n_compo: int, path_glasser: str = mni_glasser, path_MNI :str = mni_coords) :
         """
         Plot spatial components (brain networks) in 3D space using MNI coordinates.
         """
@@ -56,7 +59,7 @@ class NetworkResult:
 
         return view
 
-    def plot_components(self, n_compo: int, path_glasser: str = "template/glasser360MNI.nii.gz", path_MNI :str = 'template/MNI152_8mm_coord_dyi.mat', save=False) :
+    def plot_components(self, n_compo: int, path_glasser: str =mni_glasser, path_MNI :str =mni_coords, save=False) :
         """
         Plot spatial components (brain networks) in 3D space using MNI coordinates.
         """
@@ -81,7 +84,7 @@ class NetworkResult:
                                     colorbar=False,
                                     title=f"component {n_compo}")
         if save : 
-            img_static[0].savefig(OUT_PATH + f'/brain_networks/components{n_compo}.png')
+            img_static[0].savefig(self.path_to_save + f'/components{n_compo}.png')
 
         return img_static
 
@@ -109,7 +112,7 @@ class NetworkResult:
                 the_ax.grid()
 
         # all condition 1 ts per compo 
-        if groupby == 'components' : 
+        else : 
             fig, ax = plt.subplots(1, len(time_course_to_plot), figsize=(len(time_course_to_plot)*5, 3))
 
             for j in time_course_to_plot:
@@ -132,7 +135,7 @@ class NetworkResult:
         
 
         if save : 
-            fig.savefig(OUT_PATH + f'/brain_networks/time_courses_by_{groupby}_{label}.png')
+            fig.savefig(self.path_to_save + f'/time_courses_by_{groupby}_{label}.png')
     
     
     def plot_variance(self, save=False) : 
@@ -141,7 +144,7 @@ class NetworkResult:
         ax.set_ylabel('Explained variance (%)')
         ax.grid()
         if save:
-            fig.savefig(OUT_PATH + f'/brain_networks/expl_var.png')
+            fig.savefig(self.path_to_save + '/expl_var.png')
 
 class NetworkEstimator:
     def __init__(self,n_components: int,conditions: dict, method: str = "pca"):
