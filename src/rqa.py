@@ -42,7 +42,7 @@ class RQAResult:
         time_serie2 = np.column_stack([pc2, time])
 
         def update(frame):
-            dotemb.set_data([time_serie1[frame,0]], [time_serie2[frame, 1]])
+            dotemb.set_data([time_serie1[frame,0]], [time_serie2[frame, 0]])
             dottime1.set_data([time_serie1[frame,1]], [time_serie1[frame, 0]])
             dottime2.set_data([time_serie2[frame,1]], [time_serie2[frame, 0]])
             return dotemb,dottime1,dottime2,
@@ -57,8 +57,8 @@ class RQAResult:
         ax2d.set_title('Time serie')   
         ax2d.set_xlabel('time')  
 
-        axemb.scatter(time_serie1[:,0], time_serie2[:,1], color='lightgray', alpha=0.5)
-        dotemb,  = axemb.plot(time_serie1[0, 0], time_serie2[0, 1], 'ro', markersize=10)
+        axemb.scatter(time_serie1[:,0], time_serie2[:,0], color='lightgray', alpha=0.5)
+        dotemb,  = axemb.plot(time_serie1[0, 0], time_serie2[0, 0], 'ro', markersize=10)
 
         ax2d.plot(time_serie1[:, 1], time_serie1[:, 0])
         ax2d.plot(time_serie2[:, 1], time_serie2[:, 0])
@@ -93,7 +93,7 @@ class RQAResult:
             ax[i].set_xlabel("Time")
             ax[i].set_ylabel("Time")
 
-        fig.colorbar(im,ax=ax,label="Distance")
+        fig.colorbar(im,ax=ax[-1],label="Distance")
         plt.tight_layout()
 
         if save :
